@@ -1,6 +1,6 @@
 # Real-Time Chat Microservices Ecosystem
 
-Scaffolded WhatsApp-clone architecture with independently deployable microservices, event-driven messaging, and a React 19 frontend.
+Production-style scaffold for a WhatsApp-like platform built with microservices, event-driven messaging, and a professional React 19 frontend.
 
 ## Services
 - **auth-service** (Express + TypeScript + Prisma/PostgreSQL): registration/login, JWT, premiumStatus flag.
@@ -8,7 +8,15 @@ Scaffolded WhatsApp-clone architecture with independently deployable microservic
 - **presence-service** (Express + TypeScript + Redis): online/last seen caching.
 - **group-service** (Express + TypeScript + Prisma/PostgreSQL): group CRUD and member/admin management.
 - **media-service** (Express + TypeScript + Multer): media upload and CDN-style link responses.
-- **frontend** (React 19 + TypeScript + Tailwind + Redux Toolkit + Lucide): shell UI for chats.
+- **frontend** (React 19 + TypeScript + Tailwind + Redux Toolkit + Lucide): polished chat dashboard UI.
+
+## Frontend Feature Baseline
+- Searchable chat list with unread counters.
+- 1-to-1 and group conversation cards.
+- Premium and group indicators.
+- Active conversation panel.
+- Message composer with local send flow.
+- Tick rendering for `SENT`, `DELIVERED`, `READ`.
 
 ## Architecture Notes
 - Microservice + MVC folder structure (`models`, `dtos`, `services`, `controllers`, `routes`).
