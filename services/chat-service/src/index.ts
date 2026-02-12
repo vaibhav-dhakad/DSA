@@ -18,11 +18,30 @@ app.use(express.json());
 app.use('/api/chat', chatRouter);
 
 io.on('connection', (socket) => {
-  socket.on('message:delivered', async ({ messageId }) => {
-    await chatService.updateTick(messageId, 'DELIVERED');
+  socket.on('user:join', ({ userId }) => {
+    socket.join(`user:${userId}`);
   });
-  socket.on('message:read', async ({ messageId }) => {
-    await chatService.updateTick(messageId, 'READ');
+
+  socket.on('chat:join', ({ chatId }) => {
+    socket.join(`chat:${chatId}`);
+  });
+
+  socket.on('message:send', async (payload) => {
+    const message = await chatService.sendMessage({ ...payload, messageType: payload.messageType ?? 'TEXT' });
+    io.to(`chat:${message.chatId}`).emit('message:new', message);
+    if (message.recipientId) {
+      io.to(`user:${message.recipientId}`).emit('message:new', message);
+    }
+  });
+
+  socket.on('message:delivered', async ({ messageId, recipientId }) => {
+    const updated = await chatService.updateTick(messageId, 'DELIVERED');
+    io.to(`user:${recipientId}`).emit('message:tick', updated);
+  });
+
+  socket.on('message:read', async ({ messageId, recipientId }) => {
+    const updated = await chatService.updateTick(messageId, 'READ');
+    io.to(`user:${recipientId}`).emit('message:tick', updated);
   });
 });
 

@@ -7,6 +7,7 @@ export interface MessageDocument {
   groupId?: string;
   body: string;
   mediaUrl?: string;
+  messageType: 'TEXT' | 'AUDIO' | 'VIDEO';
   tickStatus: 'SENT' | 'DELIVERED' | 'READ';
   createdAt: Date;
 }
@@ -18,6 +19,7 @@ const messageSchema = new Schema<MessageDocument>({
   groupId: String,
   body: { type: String, required: true },
   mediaUrl: String,
+  messageType: { type: String, enum: ['TEXT', 'AUDIO', 'VIDEO'], default: 'TEXT' },
   tickStatus: { type: String, enum: ['SENT', 'DELIVERED', 'READ'], default: 'SENT' },
   createdAt: { type: Date, default: Date.now }
 });

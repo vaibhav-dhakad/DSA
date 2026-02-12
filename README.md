@@ -15,8 +15,8 @@ Production-style scaffold for a WhatsApp-like platform built with microservices,
 - 1-to-1 and group conversation cards.
 - Premium and group indicators.
 - Active conversation panel.
-- Message composer with local send flow.
-- Tick rendering for `SENT`, `DELIVERED`, `READ`.
+- Message composer with local send flow (text/audio/video modes).
+- Tick rendering for `SENT`, `DELIVERED`, `READ` and dual-user simulation toggle in UI.
 
 ## Architecture Notes
 - Microservice + MVC folder structure (`models`, `dtos`, `services`, `controllers`, `routes`).

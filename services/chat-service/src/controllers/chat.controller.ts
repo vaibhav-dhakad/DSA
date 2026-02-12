@@ -4,7 +4,11 @@ import { ChatService } from '../services/chat.service.js';
 const chatService = new ChatService();
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const message = await chatService.sendMessage(req.body);
+  const payload = {
+    ...req.body,
+    messageType: req.body.messageType ?? 'TEXT'
+  };
+  const message = await chatService.sendMessage(payload);
   res.status(201).json(message);
 };
 

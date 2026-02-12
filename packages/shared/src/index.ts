@@ -11,6 +11,7 @@ export interface UserProfile {
 }
 
 export type TickStatus = 'SENT' | 'DELIVERED' | 'READ';
+export type MessageType = 'TEXT' | 'AUDIO' | 'VIDEO';
 
 export interface ChatMessage {
   id: string;
@@ -20,6 +21,7 @@ export interface ChatMessage {
   groupId?: string;
   body: string;
   mediaUrl?: string;
+  messageType: MessageType;
   tickStatus: TickStatus;
   createdAt: string;
 }

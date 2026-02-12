@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from '@reduxjs/toolkit';
 
 export type TickStatus = 'SENT' | 'DELIVERED' | 'READ';
+export type MessageType = 'TEXT' | 'AUDIO' | 'VIDEO';
 
 export interface Message {
   id: string;
@@ -8,6 +9,8 @@ export interface Message {
   content: string;
   sentAt: string;
   tick: TickStatus;
+  messageType: MessageType;
+  mediaUrl?: string;
 }
 
 export interface ChatSummary {
@@ -26,6 +29,7 @@ interface ChatState {
   chats: ChatSummary[];
   activeChatId: string;
   searchTerm: string;
+  currentUserId: 'me' | 'u2';
 }
 
 const initialState: ChatState = {
@@ -40,8 +44,8 @@ const initialState: ChatState = {
       typing: true,
       lastSeen: 'online',
       messages: [
-        { id: 'm1', senderId: 'u1', content: 'Kafka lag is green now.', sentAt: '09:11', tick: 'READ' },
-        { id: 'm2', senderId: 'me', content: 'Great, deploying chat-service patch.', sentAt: '09:12', tick: 'DELIVERED' }
+        { id: 'm1', senderId: 'u1', content: 'Kafka lag is green now.', sentAt: '09:11', tick: 'READ', messageType: 'TEXT' },
+        { id: 'm2', senderId: 'me', content: 'Great, deploying chat-service patch.', sentAt: '09:12', tick: 'DELIVERED', messageType: 'TEXT' }
       ]
     },
     {
@@ -54,8 +58,9 @@ const initialState: ChatState = {
       typing: false,
       lastSeen: 'last seen 2m ago',
       messages: [
-        { id: 'm3', senderId: 'me', content: 'Can you review the Prisma migration?', sentAt: '08:52', tick: 'READ' },
-        { id: 'm4', senderId: 'u2', content: 'On it. Looks clean.', sentAt: '08:53', tick: 'READ' }
+        { id: 'm3', senderId: 'me', content: 'Can you review the Prisma migration?', sentAt: '08:52', tick: 'READ', messageType: 'TEXT' },
+        { id: 'm4', senderId: 'u2', content: 'On it. Looks clean.', sentAt: '08:53', tick: 'READ', messageType: 'TEXT' },
+        { id: 'm6', senderId: 'u2', content: 'Sprint-demo-voice-note.m4a', sentAt: '08:55', tick: 'READ', messageType: 'AUDIO', mediaUrl: 'https://cdn.example.com/audio/sprint-demo-voice-note.m4a' }
       ]
     },
     {
@@ -68,12 +73,13 @@ const initialState: ChatState = {
       typing: false,
       lastSeen: 'online',
       messages: [
-        { id: 'm5', senderId: 'u3', content: 'New dark theme shipped 🎨', sentAt: '08:15', tick: 'SENT' }
+        { id: 'm5', senderId: 'u3', content: 'Walkthrough.mp4', sentAt: '08:15', tick: 'SENT', messageType: 'VIDEO', mediaUrl: 'https://cdn.example.com/video/walkthrough.mp4' }
       ]
     }
   ],
   activeChatId: 'grp-001',
-  searchTerm: ''
+  searchTerm: '',
+  currentUserId: 'me'
 };
 
 const chatSlice = createSlice({
@@ -88,15 +94,23 @@ const chatSlice = createSlice({
     setSearchTerm(state, action: PayloadAction<string>) {
       state.searchTerm = action.payload;
     },
-    sendMessage(state, action: PayloadAction<{ chatId: string; content: string }>) {
+    setCurrentUser(state, action: PayloadAction<'me' | 'u2'>) {
+      state.currentUserId = action.payload;
+    },
+    sendMessage(
+      state,
+      action: PayloadAction<{ chatId: string; content: string; messageType: MessageType; mediaUrl?: string }>
+    ) {
       const chat = state.chats.find((item) => item.id === action.payload.chatId);
       if (!chat || !action.payload.content.trim()) return;
       chat.messages.push({
         id: `m-${Date.now()}`,
-        senderId: 'me',
+        senderId: state.currentUserId,
         content: action.payload.content.trim(),
         sentAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        tick: 'SENT'
+        tick: 'SENT',
+        messageType: action.payload.messageType,
+        mediaUrl: action.payload.mediaUrl
       });
     },
     updateTickStatus(state, action: PayloadAction<{ chatId: string; messageId: string; tick: TickStatus }>) {
@@ -107,7 +121,7 @@ const chatSlice = createSlice({
   }
 });
 
-export const { setActiveChat, setSearchTerm, sendMessage, updateTickStatus } = chatSlice.actions;
+export const { setActiveChat, setSearchTerm, setCurrentUser, sendMessage, updateTickStatus } = chatSlice.actions;
 
 export const selectChatState = (state: { chat: ChatState }) => state.chat;
 
